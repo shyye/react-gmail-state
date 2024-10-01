@@ -8,6 +8,7 @@ function App() {
   // Use initialEmails for state
   console.log(initialEmails);
   const [emails, setEmails] = useState(initialEmails);
+  const [isHideRead, setIsHideRead] = useState(false);
   // console.log(emails);
 
   // TODO: How does functions here automatically have an event if no parameter is given?
@@ -44,6 +45,10 @@ function App() {
     );
   }
 
+  function handleHideRead() {
+    setIsHideRead(!isHideRead);
+  }
+
   return (
     <div className="app">
       <Header />
@@ -69,8 +74,9 @@ function App() {
             <input
               id="hide-read"
               type="checkbox"
-              checked={false}
+              checked={isHideRead}
               // onChange={() => {}}
+              onChange={handleHideRead}
             />
           </li>
         </ul>
@@ -79,30 +85,39 @@ function App() {
         {
           /* Render a list of emails here */
           // Reference, event with parameter: https://stackoverflow.com/a/42597619
-          emails.map((email) => (
-            // <li key={email.id} className="email">
-            <li key={email.id} className={email.read ? "email read" : "email"}>
-              <div className="select">
-                <input
-                  className="select-checkbox"
-                  type="checkbox"
-                  checked={email.read ? true : false}
-                  // TODO: What is the correct way to do this? Pass parameters like this or read the 'key' value from parent element
-                  onChange={() => toggleRead(email.id, email.read)}
-                />
-              </div>
-              <div className="star">
-                <input
-                  className="star-checkbox"
-                  type="checkbox"
-                  checked={email.starred ? true : false}
-                  onChange={() => toggleStar(email.id, email.starred)}
-                />
-              </div>
-              <div className="sender">{email.sender}</div>
-              <div className="title">{email.title}</div>
-            </li>
-          ))
+          // isHideRead === true ? ()
+          emails.map((email) =>
+            
+            // Prevent rendering of read emails if the 'Hide Read' input is ticked
+            isHideRead && email.read === true ? (
+              ""
+            ) : (
+              <li
+                key={email.id}
+                className={email.read ? "email read" : "email"}
+              >
+                <div className="select">
+                  <input
+                    className="select-checkbox"
+                    type="checkbox"
+                    checked={email.read ? true : false}
+                    // TODO: What is the correct way to do this? Pass parameters like this or read the 'key' value from parent element
+                    onChange={() => toggleRead(email.id, email.read)}
+                  />
+                </div>
+                <div className="star">
+                  <input
+                    className="star-checkbox"
+                    type="checkbox"
+                    checked={email.starred ? true : false}
+                    onChange={() => toggleStar(email.id, email.starred)}
+                  />
+                </div>
+                <div className="sender">{email.sender}</div>
+                <div className="title">{email.title}</div>
+              </li>
+            )
+          )
         }
       </main>
     </div>
