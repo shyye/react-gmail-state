@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import initialEmails from "./data/emails";
 
@@ -8,7 +8,9 @@ function App() {
   // Use initialEmails for state
   console.log(initialEmails);
   const [emails, setEmails] = useState(initialEmails);
+  const [filteredEmails, setFilteredEmails] = useState(emails);
   const [isHideRead, setIsHideRead] = useState(false);
+  const [currentTab, setCurrentTab] = useState('inbox');
   // console.log(emails);
 
   // TODO: How does functions here automatically have an event if no parameter is given?
@@ -46,7 +48,19 @@ function App() {
   }
 
   function handleHideRead() {
-    setIsHideRead(!isHideRead);
+    // Set state doesn't update immedately, thereby local variable
+    const newValue = !isHideRead;
+    setIsHideRead(newValue)
+
+    if (newValue) {
+      setFilteredEmails(getUnreadEmails(emails))
+    } else {
+      setFilteredEmails(emails)
+    }
+  }
+
+  function getUnreadEmails(emails) {
+       return emails.filter((email) => email.read === false)
   }
 
   return (
@@ -55,15 +69,16 @@ function App() {
       <nav className="left-menu">
         <ul className="inbox-list">
           <li
-            className="item active"
-            // onClick={() => {}}
+            className={currentTab === 'inbox' ? "item active" : "item"}
+            // className="item active"
+            onClick={() => {setCurrentTab("inbox")}}
           >
             <span className="label">Inbox</span>
             <span className="count">?</span>
           </li>
           <li
-            className="item"
-            // onClick={() => {}}
+            className={currentTab === 'starred' ? "item active" : "item"}
+            onClick={() => {setCurrentTab("starred")}}
           >
             <span className="label">Starred</span>
             <span className="count">?</span>
@@ -85,14 +100,8 @@ function App() {
         {
           /* Render a list of emails here */
           // Reference, event with parameter: https://stackoverflow.com/a/42597619
-          // isHideRead === true ? ()
-          emails.map((email) =>
-            
-            // Prevent rendering of read emails if the 'Hide Read' input is ticked
-            isHideRead && email.read === true ? (
-              ""
-            ) : (
-              <li
+          filteredEmails.map((email) =>
+            <li
                 key={email.id}
                 className={email.read ? "email read" : "email"}
               >
@@ -116,7 +125,6 @@ function App() {
                 <div className="sender">{email.sender}</div>
                 <div className="title">{email.title}</div>
               </li>
-            )
           )
         }
       </main>
